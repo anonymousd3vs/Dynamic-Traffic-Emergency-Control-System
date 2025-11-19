@@ -1,0 +1,224 @@
+# Dynamic Traffic Emergency Control System - .gitignore
+# Classic Deployment Only (Excluding Docker)
+
+# ============================================================================
+# Docker Files (Not included in classic deployment)
+# ============================================================================
+docker/
+docker-compose.yml
+Dockerfile
+.dockerignore
+**/docker/
+**/Dockerfile*
+
+# ============================================================================
+# Documentation (Exclude unnecessary docs)
+# ============================================================================
+docs/DOCKER_DEPLOYMENT.md
+docs/CONSOLIDATION_COMPLETE.txt
+docs/CONSOLIDATION_SUMMARY.md
+docs/REORGANIZATION_FINAL.md
+docs/Colleague_Work_Spec.md
+
+# ============================================================================
+# Python Environment & Dependencies
+# ============================================================================
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+.conda/
+conda-meta/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================================================
+# Node.js Dependencies
+# ============================================================================
+node_modules/
+dashboard/frontend/node_modules/
+dashboard/backend/node_modules/
+npm-debug.log
+npm-error.log
+yarn-error.log
+.pnpm-debug.log
+
+# ============================================================================
+# Build Outputs
+# ============================================================================
+dashboard/frontend/dist/
+dashboard/frontend/build/
+*.min.js
+*.min.css
+
+# ============================================================================
+# IDE and Editor Files
+# ============================================================================
+.vscode/
+.idea/
+*.code-workspace
+*.iml
+*.swp
+*.swo
+*~
+.ipynb_checkpoints/
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================================
+# Video Files (Keep only specific demo videos)
+# ============================================================================
+videos/*.mp4
+videos/*.avi
+videos/*.mov
+videos/*.mkv
+videos/*.flv
+videos/*.webm
+!videos/Delhi.mp4
+!videos/Delhi2.mp4
+!videos/Hospital.mp4
+!videos/.gitkeep
+!videos/README.md
+
+# ============================================================================
+# Model Files (Keep only essential models used in production)
+# ============================================================================
+# Exclude all models by default
+models/*.pt
+models/*.onnx
+models/indian_ambulance_yolov11m_best.pt
+models/indian_ambulance_yolov8.pt
+models/indian_ambulance_yolov8.onnx
+models/yolo11s.pt
+
+# Keep only the models actually used
+!models/.gitkeep
+!models/README.md
+!models/indian_ambulance_yolov11n_best.pt
+!models/yolo11n.pt
+
+# Optimized models - keep only actively used ones
+optimized_models/*.pt
+optimized_models/*.onnx
+optimized_models/quantized_indian_ambulance_yolov11n_best.pt
+optimized_models/quantized_yolo11n.pt
+!optimized_models/README.md
+!optimized_models/indian_ambulance_yolov11n_best.onnx
+!optimized_models/yolo11n.onnx
+
+# ============================================================================
+# Logs and Temporary Files
+# ============================================================================
+logs/
+*.log
+*.log.*
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# ============================================================================
+# Config Backups
+# ============================================================================
+config/*.backup
+config/*.bak
+config/*.old
+
+# ============================================================================
+# Environment Variables
+# ============================================================================
+.env
+.env.local
+.env.*.local
+
+# ============================================================================
+# Testing and Coverage
+# ============================================================================
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.hypothesis/
+test_output/
+test_results/
+coverage/
+
+# ============================================================================
+# Cache
+# ============================================================================
+.cache/
+*.cache
+__pycache__/
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+# Analysis outputs
+output/
+outputs/
+results/
+screenshots/
+recordings/
+analysis/
+reports/
+metrics/
+
+# Large datasets
+dataset/
+datasets/
+Vehicle Dataset/
+new_dataset/
+
+# Misc
+.playwright-mcp
+gpu_check.ipynb
+recent_changes_docs/
+
+# ============================================================================
+# END OF .gitignore
+# ============================================================================
+*.zip

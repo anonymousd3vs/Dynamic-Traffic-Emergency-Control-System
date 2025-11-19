@@ -1,0 +1,31 @@
+{
+    "video_source": "videos\\ammuvid.mp4",
+    "timestamp": "2025-11-04 23:05:26",
+    "frame_dimensions": {
+        "width": 1920,
+        "height": 1080
+    },
+    "lane_points": [
+        [
+            644,
+            319
+        ],
+        [
+            874,
+            299
+        ],
+        [
+            1329,
+            542
+        ],
+        [
+            1052,
+            592
+        ],
+        [
+            739,
+            443
+        ]
+    ],
+    "num_points": 5
+}

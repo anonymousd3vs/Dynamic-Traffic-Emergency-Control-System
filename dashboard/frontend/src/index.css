@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Premium Pastel Theme with Soft Gradients */
+@layer base {
+  :root {
+    --primary: #a5b4fc;
+    --secondary: #d8b4fe;
+    --accent-blue: #a5b4fc;
+    --accent-purple: #d8b4fe;
+    --accent-pink: #f9a8d4;
+    --success: #86efac;
+    --danger: #fda4af;
+    --warning: #fcd34d;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-gradient-to-br from-[#1a1f2e] via-[#242b3d] to-[#2d3548] text-slate-100 font-sans;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-slate-50 tracking-tight;
+  }
+
+  button {
+    @apply cursor-pointer transition-all duration-200;
+  }
+
+  input, select, textarea {
+    @apply bg-slate-800/50 text-slate-100 border-slate-600/50;
+  }
+
+  a {
+    @apply text-pastel-blue hover:text-pastel-purple transition-colors;
+  }
+}
+
+/* Card Component */
+@layer components {
+  .card {
+    @apply relative bg-gradient-to-br from-[#242b3d]/90 to-[#2d3548]/80 rounded-2xl shadow-xl border border-slate-700/50 p-6 hover:border-pastel-purple/50 transition-all duration-300 backdrop-blur-md;
+    background-image: linear-gradient(135deg, rgba(36, 43, 61, 0.9) 0%, rgba(45, 53, 72, 0.8) 100%);
+  }
+
+  .card-compact {
+    @apply bg-slate-800/50 rounded-xl shadow-md border border-slate-700/50 p-4 hover:border-pastel-blue/40 transition-colors backdrop-blur-sm;
+  }
+
+  .card-title {
+    @apply text-xl font-bold bg-gradient-to-r from-pastel-blue via-pastel-purple to-pastel-pink bg-clip-text text-transparent mb-4;
+  }
+
+  .card-subtitle {
+    @apply text-sm text-slate-400 mb-3;
+  }
+
+  /* Button Variants */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-pastel-blue to-pastel-purple text-slate-900 hover:shadow-glow-purple active:opacity-90 font-bold;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-700/60 text-pastel-blue border border-pastel-blue/40 hover:bg-slate-600/70 hover:shadow-glow-blue;
+  }
+
+  .btn-danger {
+    @apply bg-gradient-to-r from-pastel-rose to-pastel-pink text-slate-900 hover:shadow-glow-pink active:opacity-90 font-bold;
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-pastel-green to-pastel-teal text-slate-900 hover:shadow-glow-green active:opacity-90 font-bold;
+  }
+
+  .btn-outline {
+    @apply border-2 border-pastel-purple text-pastel-purple hover:bg-slate-800/50 focus:ring-pastel-purple;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+
+  /* Badge Variants */
+  .badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-slate-800/70 border backdrop-blur-sm;
+  }
+
+  .badge-primary {
+    @apply border-pastel-blue/50 text-pastel-blue;
+  }
+
+  .badge-success {
+    @apply border-pastel-green/50 text-pastel-green;
+  }
+
+  .badge-danger {
+    @apply border-pastel-rose/50 text-pastel-rose;
+  }
+
+  .badge-warning {
+    @apply border-pastel-yellow/50 text-pastel-yellow;
+  }
+
+  /* Input Styles */
+  .input {
+    @apply w-full px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-800/50 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-pastel-purple focus:border-transparent transition-colors;
+  }
+
+  .input-sm {
+    @apply px-2 py-1 text-sm;
+  }
+
+  .input-lg {
+    @apply px-4 py-3 text-lg;
+  }
+
+  /* Select Styles */
+  select {
+    @apply border border-slate-600/50 rounded-lg px-3 py-2 bg-slate-800/50 text-slate-100 focus:outline-none focus:ring-2 focus:ring-pastel-purple;
+  }
+
+  /* Metric Card */
+  .metric-card {
+    @apply bg-slate-800/60 rounded-xl shadow-md border border-slate-700/50 p-6 text-center hover:border-pastel-blue/50 transition-colors backdrop-blur-sm;
+  }
+
+  .metric-value {
+    @apply text-3xl font-bold bg-gradient-to-r from-pastel-blue to-pastel-purple bg-clip-text text-transparent my-2;
+  }
+
+  .metric-label {
+    @apply text-sm text-slate-400 font-medium;
+  }
+
+  /* Status Indicator */
+  .status-indicator {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border backdrop-blur-sm;
+  }
+
+  .status-online {
+    @apply bg-slate-800/70 border-pastel-green/50 text-pastel-green;
+  }
+
+  .status-offline {
+    @apply bg-slate-800/70 border-pastel-rose/50 text-pastel-rose;
+  }
+
+  .status-idle {
+    @apply bg-slate-800/70 border-slate-600/50 text-slate-400;
+  }
+
+  .status-warning {
+    @apply bg-slate-800/70 border-pastel-yellow/50 text-pastel-yellow;
+  }
+
+  /* Alert */
+  .alert-emergency {
+    @apply bg-slate-800/60 border border-pastel-rose/50 text-pastel-rose px-4 py-3 rounded-lg backdrop-blur-sm;
+  }
+
+  .alert-warning {
+    @apply bg-slate-800/60 border border-pastel-yellow/50 text-pastel-yellow px-4 py-3 rounded-lg backdrop-blur-sm;
+  }
+
+  .alert-success {
+    @apply bg-slate-800/60 border border-pastel-green/50 text-pastel-green px-4 py-3 rounded-lg backdrop-blur-sm;
+  }
+
+  .alert-info {
+    @apply bg-slate-800/60 border border-pastel-blue/50 text-pastel-blue px-4 py-3 rounded-lg backdrop-blur-sm;
+  }
+
+  /* Table */
+  table {
+    @apply w-full border-collapse;
+  }
+
+  th {
+    @apply bg-slate-800/60 text-pastel-blue font-bold p-3 text-left border-b border-slate-700/50;
+  }
+
+  td {
+    @apply p-3 border-b border-slate-700/50 text-slate-300;
+  }
+
+  tr:hover {
+    @apply bg-slate-700/40;
+  }
+
+  .divider {
+    @apply my-4 border-t border-slate-700/50;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1f2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #c7d2fe 0%, #e9d5ff 100%);
+  box-shadow: 0 0 10px rgba(165, 180, 252, 0.3);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .hidden-mobile {
+    @apply hidden;
+  }
+}
+
+@media (min-width: 769px) {
+  .hidden-desktop {
+    @apply hidden;
+  }
+}

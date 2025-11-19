@@ -1,0 +1,27 @@
+{
+    "video_source": "videos\\Hospital.mp4",
+    "timestamp": "2025-11-04 23:04:55",
+    "frame_dimensions": {
+        "width": 600,
+        "height": 316
+    },
+    "lane_points": [
+        [
+            143,
+            20
+        ],
+        [
+            479,
+            10
+        ],
+        [
+            522,
+            296
+        ],
+        [
+            137,
+            297
+        ]
+    ],
+    "num_points": 4
+}

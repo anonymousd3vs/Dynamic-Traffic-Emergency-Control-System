@@ -1,0 +1,29 @@
+##############################################
+# Minimal runtime requirements (production)  #
+##############################################
+
+# Core ML/CV stack
+ultralytics>=8.0.0
+torch>=2.0.0
+torchvision>=0.15.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+Pillow>=9.5.0
+PyYAML>=6.0
+
+# Tracking (ByteTrack-style Kalman + matching)
+scipy>=1.10.0
+filterpy>=1.4.5
+
+# Dashboard dependencies
+python-socketio>=5.8.0
+aiohttp>=3.8.0
+aiohttp-cors>=0.7.0
+Flask>=2.3.0
+flask-cors>=4.0.0
+
+# HTTP requests (for health checks)
+requests>=2.31.0
+
+# ONNX Runtime for optimized inference
+onnxruntime>=1.16.0

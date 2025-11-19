@@ -1,0 +1,27 @@
+{
+    "video_source": "videos\\Delhi2.mp4",
+    "timestamp": "2025-10-31 20:36:00",
+    "frame_dimensions": {
+        "width": 596,
+        "height": 336
+    },
+    "lane_points": [
+        [
+            402,
+            92
+        ],
+        [
+            281,
+            76
+        ],
+        [
+            141,
+            299
+        ],
+        [
+            338,
+            318
+        ]
+    ],
+    "num_points": 4
+}

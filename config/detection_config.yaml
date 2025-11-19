@@ -1,0 +1,26 @@
+# Detection Model Configuration
+# Confidence thresholds for different models
+
+detection:
+  # Vehicle detection settings
+  vehicle:
+    confidence_threshold: 0.3 # Lowered from 0.5 for better detection on new systems
+    nms_threshold: 0.45
+    min_detections: 0 # Minimum detections per frame (0 = none required)
+
+  # Ambulance detection settings
+  ambulance:
+    confidence_threshold: 0.2 # Very low for ambulance detection
+    nms_threshold: 0.4
+
+  # GPU/Performance settings
+  device: "auto" # "cpu", "cuda", or "auto" (auto-detect)
+
+  # Debug settings
+  debug: false
+  debug_output_dir: "debug_output"
+
+  # Frame processing
+  max_frame_width: 1920
+  max_frame_height: 1080
+  process_every_n_frames: 1 # Process every frame

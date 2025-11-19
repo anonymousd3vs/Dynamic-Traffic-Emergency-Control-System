@@ -1,0 +1,27 @@
+{
+    "video_source": "videos\\new.mp4",
+    "timestamp": "2025-10-31 20:37:37",
+    "frame_dimensions": {
+        "width": 768,
+        "height": 432
+    },
+    "lane_points": [
+        [
+            240,
+            76
+        ],
+        [
+            426,
+            74
+        ],
+        [
+            583,
+            403
+        ],
+        [
+            89,
+            391
+        ]
+    ],
+    "num_points": 4
+}
