@@ -72,7 +72,6 @@ The project follows a modern, decoupled architecture:
 1.  **Clone the Repository**
     ```bash
     git clone https://github.com/anonymousd3vs/Dynamic-Traffic-Emergency-Control-System.git
-    cd Dynamic-Traffic-Emergency-Control-System
     ```
 
 2.  **Install Python Dependencies**
