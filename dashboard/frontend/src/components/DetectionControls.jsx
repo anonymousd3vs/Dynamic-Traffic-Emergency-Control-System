@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Play, Square, Video, Settings, Camera, FileVideo, RefreshCw } from 'lucide-react';
+import { Play, Square, Camera, FileVideo, RefreshCw, Settings } from 'lucide-react';
 import useDashboardStore from '../stores/dashboardStore';
 
 /**
- * Detection Controls Component
- * Provides UI for configuring and controlling the traffic detection system
+ * Detection Controls Component - Monochrome Theme
  */
 export default function DetectionControls({ onVideoStart, onVideoStop }) {
   const [isRunning, setIsRunning] = useState(false);
@@ -18,34 +17,17 @@ export default function DetectionControls({ onVideoStart, onVideoStop }) {
   const [configPath, setConfigPath] = useState('');
   const { reset: resetDashboard } = useDashboardStore();
 
-  // Fetch available video files on mount
-  useEffect(() => {
-    fetchVideoFiles();
-    checkSystemStatus();
-  }, []);
-
-  // Check system status periodically
-  useEffect(() => {
-    const interval = setInterval(checkSystemStatus, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => { fetchVideoFiles(); checkSystemStatus(); }, []);
+  useEffect(() => { const i = setInterval(checkSystemStatus, 5000); return () => clearInterval(i); }, []);
 
   const fetchVideoFiles = async () => {
-    console.log('Fetching video files...');
     try {
       const response = await fetch('http://localhost:8765/api/videos/list');
       if (response.ok) {
         const data = await response.json();
-        console.log('Video files received:', data);
-        const videos = data.videos || [];
-        setVideoFiles(videos);
-        console.log('Video files set:', videos.length, 'videos');
-      } else {
-        console.error('Failed to fetch videos:', response.status);
+        setVideoFiles(data.videos || []);
       }
-    } catch (error) {
-      console.error('Error fetching video files:', error);
-    }
+    } catch (error) { console.error('Error fetching videos:', error); }
   };
 
   const checkSystemStatus = async () => {
@@ -55,373 +37,210 @@ export default function DetectionControls({ onVideoStart, onVideoStop }) {
         const data = await response.json();
         setIsRunning(data.is_running || false);
       }
-    } catch (error) {
-      console.error('Error checking system status:', error);
-    }
+    } catch (error) { console.error('Error checking status:', error); }
   };
 
   const checkConfiguration = async () => {
-    if (videoSource !== 'file' || !videoFile) {
-      setHasConfig(false);
-      setCheckingConfig(false);
-      return;
-    }
-
-    console.log('Checking config for:', videoFile);
-    setCheckingConfig(true);
-    setHasConfig(false);
-    
+    if (videoSource !== 'file' || !videoFile) { setHasConfig(false); setCheckingConfig(false); return; }
+    setCheckingConfig(true); setHasConfig(false);
     try {
-      const response = await fetch('http://localhost:8765/api/config/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const r = await fetch('http://localhost:8765/api/config/check', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ video_source: videoFile })
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Config check result:', data);
-        setHasConfig(data.has_config || false);
-        setConfigPath(data.config_path || '');
-      } else {
-        console.error('Config check failed:', response.status);
-        setHasConfig(false);
-      }
-    } catch (error) {
-      console.error('Error checking configuration:', error);
-      setHasConfig(false);
-    } finally {
-      console.log('Config check complete');
-      setCheckingConfig(false);
-    }
+      if (r.ok) { const d = await r.json(); setHasConfig(d.has_config || false); setConfigPath(d.config_path || ''); }
+    } catch (e) { setHasConfig(false); } finally { setCheckingConfig(false); }
   };
 
-  // Check config when video file changes
   useEffect(() => {
-    if (videoSource === 'file' && videoFile) {
-      checkConfiguration();
-    } else {
-      setCheckingConfig(false);
-      setHasConfig(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (videoSource === 'file' && videoFile) checkConfiguration();
+    else { setCheckingConfig(false); setHasConfig(false); }
   }, [videoFile, videoSource]);
 
   const handleStart = async () => {
     const source = videoSource === 'camera' ? cameraIndex : videoFile;
-    
-    if (!source) {
-      alert('Please select a video source');
-      return;
-    }
+    if (!source) { alert('Please select a video source'); return; }
 
-    // For video files, make sure we have the latest config path
     let finalConfigPath = configPath;
     if (videoSource === 'file' && !finalConfigPath && laneFiltering) {
-      // Re-check config path synchronously to ensure we have it
       try {
-        const response = await fetch('http://localhost:8765/api/config/check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const r = await fetch('http://localhost:8765/api/config/check', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ video_source: videoFile })
         });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.has_config && data.config_path) {
-            finalConfigPath = data.config_path;
-            setConfigPath(finalConfigPath);
-          }
-        }
-      } catch (error) {
-        console.error('Error re-checking config:', error);
-      }
+        if (r.ok) { const d = await r.json(); if (d.has_config && d.config_path) { finalConfigPath = d.config_path; setConfigPath(finalConfigPath); } }
+      } catch (e) { }
     }
 
-    // If using file and lane filtering is enabled, check if we found config
     if (videoSource === 'file' && laneFiltering && !finalConfigPath) {
-      const proceed = confirm(
-        'No lane configuration found for this video. Do you want to:\n\n' +
-        '1. Click OK to create configuration now\n' +
-        '2. Click Cancel to run without lane filtering'
-      );
-
-      if (proceed) {
-        await openConfigurationTool();
-        return;
-      } else {
-        setLaneFiltering(false);
-      }
+      const proceed = confirm('No lane configuration found. OK to configure now, Cancel to run without lane filtering.');
+      if (proceed) { await openConfigurationTool(); return; } else { setLaneFiltering(false); }
     }
 
     try {
-      const response = await fetch('http://localhost:8765/api/detection/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source,
-          lane_filtering: laneFiltering,
-          config_path: finalConfigPath || undefined
-        })
+      const r = await fetch('http://localhost:8765/api/detection/start', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source, lane_filtering: laneFiltering, config_path: finalConfigPath || undefined })
       });
-
-      if (response.ok) {
-        // ✅ RESET: Clear all metrics, history, and alerts when starting new video
-        resetDashboard();
-        setIsRunning(true);
-        if (onVideoStart) onVideoStart(); // Call parent callback
-        console.log('✅ Detection started - Dashboard metrics reset');
-      } else {
-        const error = await response.json();
-        alert(`Failed to start detection: ${error.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      alert(`Error starting detection: ${error.message}`);
-    }
+      if (r.ok) { resetDashboard(); setIsRunning(true); if (onVideoStart) onVideoStart(); }
+      else { const e = await r.json(); alert(`Failed: ${e.message || 'Unknown error'}`); }
+    } catch (e) { alert(`Error: ${e.message}`); }
   };
 
   const handleStop = async () => {
     try {
-      const response = await fetch('http://localhost:8765/api/detection/stop', {
-        method: 'POST'
-      });
-
-      if (response.ok) {
-        setIsRunning(false);
-        if (onVideoStop) onVideoStop(); // Call parent callback to clear alerts
-      }
-    } catch (error) {
-      alert(`Error stopping detection: ${error.message}`);
-    }
+      const r = await fetch('http://localhost:8765/api/detection/stop', { method: 'POST' });
+      if (r.ok) { setIsRunning(false); if (onVideoStop) onVideoStop(); }
+    } catch (e) { alert(`Error: ${e.message}`); }
   };
 
   const openConfigurationTool = async () => {
-    if (!videoFile) {
-      alert('Please select a video file first');
-      return;
-    }
-
+    if (!videoFile) { alert('Select a video file first'); return; }
     try {
-      const response = await fetch('http://localhost:8765/api/config/launch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const r = await fetch('http://localhost:8765/api/config/launch', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ video_source: videoFile })
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        alert(`Configuration tool launched. ${data.message || 'Please configure lanes in the opened window.'}`);
-        // Recheck configuration after tool closes with multiple attempts
-        setTimeout(() => checkConfiguration(), 1000);
-        setTimeout(() => checkConfiguration(), 2500);
-        setTimeout(() => checkConfiguration(), 4000);
+      if (r.ok) {
+        alert('Configuration tool launched. Configure lanes in the opened window.');
+        setTimeout(checkConfiguration, 1000);
+        setTimeout(checkConfiguration, 2500);
       }
-    } catch (error) {
-      alert(`Error launching configuration tool: ${error.message}`);
-    }
+    } catch (e) { alert(`Error: ${e.message}`); }
   };
 
   const handleReset = async () => {
-    if (!confirm('Reset vehicle count? This cannot be undone.')) {
-      return;
-    }
-
-    try {
-      await fetch('http://localhost:8765/api/detection/reset', {
-        method: 'POST'
-      });
-    } catch (error) {
-      console.error('Error resetting count:', error);
-    }
+    if (!confirm('Reset vehicle count? This cannot be undone.')) return;
+    try { await fetch('http://localhost:8765/api/detection/reset', { method: 'POST' }); } catch (e) { }
   };
 
   return (
-    <div className="card space-y-6">
+    <div className="space-y-4">
+      {/* Status Badge */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold flex items-center gap-2 bg-gradient-to-r from-pastel-blue to-pastel-purple bg-clip-text text-transparent">
-          <Settings className="w-6 h-6 text-pastel-blue" />
-          Detection Controls
-        </h2>
-        <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-          isRunning ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-300'
-        }`}>
-          {isRunning ? '● RUNNING' : '○ STOPPED'}
-        </div>
+        <span className="text-xs text-gray-500 uppercase tracking-wider">Status</span>
+        <span className={`px-2.5 py-1 rounded text-xs font-medium ${isRunning ? 'bg-green-600 text-white' : 'bg-[#1a1a1a] text-gray-400 border border-[#2a2a2a]'
+          }`}>
+          {isRunning ? '● Running' : '○ Stopped'}
+        </span>
       </div>
 
-      {/* Video Source Selection */}
-      <div className="space-y-3">
-        <label className="block text-sm font-semibold text-slate-200">
-          Video Source
-        </label>
-        
-        <div className="flex gap-2">
+      {/* Video Source */}
+      <div className="space-y-2">
+        <label className="text-xs text-gray-500 uppercase tracking-wider">Video Source</label>
+        <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setVideoSource('camera')}
             disabled={isRunning}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-              videoSource === 'camera'
-                ? 'bg-gradient-to-r from-pastel-blue to-blue-500 text-slate-950'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            } ${isRunning ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`flex items-center justify-center gap-2 py-2 rounded text-sm font-medium transition-colors ${videoSource === 'camera' ? 'bg-white text-black' : 'bg-[#1a1a1a] text-gray-400 border border-[#2a2a2a]'
+              } ${isRunning ? 'opacity-50 cursor-not-allowed' : 'hover:text-white'}`}
           >
-            <Camera className="w-5 h-5" />
-            Camera
+            <Camera className="w-4 h-4" /> Camera
           </button>
-          
           <button
             onClick={() => setVideoSource('file')}
             disabled={isRunning}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-              videoSource === 'file'
-                ? 'bg-gradient-to-r from-pastel-blue to-blue-500 text-slate-950'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            } ${isRunning ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`flex items-center justify-center gap-2 py-2 rounded text-sm font-medium transition-colors ${videoSource === 'file' ? 'bg-white text-black' : 'bg-[#1a1a1a] text-gray-400 border border-[#2a2a2a]'
+              } ${isRunning ? 'opacity-50 cursor-not-allowed' : 'hover:text-white'}`}
           >
-            <FileVideo className="w-5 h-5" />
-            Video File
+            <FileVideo className="w-4 h-4" /> File
           </button>
         </div>
 
         {videoSource === 'camera' ? (
-          <div>
-            <label className="block text-sm text-slate-400 mb-2">Camera Index</label>
-            <input
-              type="number"
-              value={cameraIndex}
-              onChange={(e) => setCameraIndex(e.target.value)}
-              disabled={isRunning}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-50 focus:ring-2 focus:ring-pastel-blue disabled:opacity-50"
-              min="0"
-              max="9"
-            />
-          </div>
+          <input
+            type="number"
+            value={cameraIndex}
+            onChange={(e) => setCameraIndex(e.target.value)}
+            disabled={isRunning}
+            placeholder="Camera Index"
+            className="w-full px-3 py-2 bg-[#141414] border border-[#2a2a2a] rounded text-white text-sm focus:outline-none focus:border-white disabled:opacity-50"
+            min="0" max="9"
+          />
         ) : (
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm text-slate-400">Select Video File</label>
-              <button
-                onClick={fetchVideoFiles}
-                className="text-pastel-blue hover:text-pastel-blue/80 p-1"
-                title="Refresh list"
-              >
-                <RefreshCw className="w-4 h-4" />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">Select Video</span>
+              <button onClick={fetchVideoFiles} className="text-gray-500 hover:text-white">
+                <RefreshCw className="w-3 h-3" />
               </button>
             </div>
-            
             <select
               value={videoFile}
               onChange={(e) => setVideoFile(e.target.value)}
               disabled={isRunning}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-50 focus:ring-2 focus:ring-pastel-blue disabled:opacity-50"
+              className="w-full px-3 py-2 bg-[#141414] border border-[#2a2a2a] rounded text-white text-sm focus:outline-none focus:border-white disabled:opacity-50"
             >
-              <option value="">-- Select a video --</option>
-              {videoFiles.map((file, idx) => (
-                <option key={idx} value={file}>{file}</option>
-              ))}
+              <option value="">-- Select --</option>
+              {videoFiles.map((f, i) => <option key={i} value={f}>{f}</option>)}
             </select>
 
             {videoFile && (
-              <div className="mt-3 p-3 bg-slate-700 rounded-lg border border-slate-600">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {checkingConfig ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin text-pastel-blue" />
-                        <span className="text-sm text-slate-400">Checking configuration...</span>
-                      </>
-                    ) : hasConfig ? (
-                      <>
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm text-pastel-green">Configuration found ✓</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                        <span className="text-sm text-pastel-yellow">No configuration</span>
-                      </>
-                    )}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <button
-                      onClick={openConfigurationTool}
-                      disabled={isRunning}
-                      className={`text-xs px-3 py-1 rounded transition-all ${
-                        hasConfig
-                          ? 'bg-pastel-purple hover:bg-pastel-purple/80 text-slate-950'
-                          : 'bg-pastel-blue hover:bg-pastel-blue/80 text-slate-950'
-                      } ${isRunning ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      {hasConfig ? 'Reconfigure' : 'Configure Lanes'}
-                    </button>
-                  </div>
+              <div className="flex items-center justify-between p-2 bg-[#0a0a0a] rounded border border-[#2a2a2a]">
+                <div className="flex items-center gap-2">
+                  {checkingConfig ? (
+                    <><RefreshCw className="w-3 h-3 animate-spin text-gray-400" /><span className="text-xs text-gray-500">Checking...</span></>
+                  ) : hasConfig ? (
+                    <><div className="w-2 h-2 bg-green-500 rounded-full" /><span className="text-xs text-green-400">Config found</span></>
+                  ) : (
+                    <><div className="w-2 h-2 bg-yellow-500 rounded-full" /><span className="text-xs text-yellow-400">No config</span></>
+                  )}
                 </div>
+                <button
+                  onClick={openConfigurationTool}
+                  disabled={isRunning}
+                  className="text-xs px-2 py-1 bg-[#1a1a1a] text-gray-300 hover:text-white rounded border border-[#2a2a2a] disabled:opacity-50"
+                >
+                  {hasConfig ? 'Edit' : 'Configure'}
+                </button>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* Detection Settings */}
-      <div className="space-y-3">
-        <label className="block text-sm font-semibold text-slate-200">
-          Detection Settings
-        </label>
-        
-        <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg border border-slate-600">
-          <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-pastel-blue" />
-            <div>
-              <div className="text-sm font-medium text-slate-50">Lane-Based Filtering</div>
-              <div className="text-xs text-slate-400">Filter vehicles by configured lanes</div>
-            </div>
-          </div>
-          <button
-            onClick={() => setLaneFiltering(!laneFiltering)}
-            disabled={isRunning}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              laneFiltering ? 'bg-pastel-blue' : 'bg-slate-600'
-            } ${isRunning ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-slate-950 transition-transform ${
-                laneFiltering ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
+      {/* Lane Filtering Toggle */}
+      <div className="flex items-center justify-between p-3 bg-[#141414] rounded border border-[#2a2a2a]">
+        <div className="flex items-center gap-2">
+          <Settings className="w-4 h-4 text-gray-500" />
+          <span className="text-sm text-gray-300">Lane Filtering</span>
         </div>
+        <button
+          onClick={() => setLaneFiltering(!laneFiltering)}
+          disabled={isRunning}
+          className={`relative w-10 h-5 rounded-full transition-colors ${laneFiltering ? 'bg-white' : 'bg-[#333]'
+            } ${isRunning ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-black transition-transform ${laneFiltering ? 'left-5' : 'left-0.5'
+            }`} />
+        </button>
       </div>
 
       {/* Control Buttons */}
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         {!isRunning ? (
           <button
             onClick={handleStart}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors shadow-glow-green"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded transition-colors"
           >
-            <Play className="w-5 h-5" />
-            Start Detection
+            <Play className="w-4 h-4" /> Start
           </button>
         ) : (
           <button
             onClick={handleStop}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors shadow-glow-pink"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-colors"
           >
-            <Square className="w-5 h-5" />
-            Stop Detection
+            <Square className="w-4 h-4" /> Stop
           </button>
         )}
-        
         <button
           onClick={handleReset}
           disabled={!isRunning}
-          className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-pastel-blue font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2.5 bg-[#1a1a1a] text-gray-400 hover:text-white font-medium rounded border border-[#2a2a2a] transition-colors disabled:opacity-50"
         >
-          Reset Count
+          Reset
         </button>
       </div>
     </div>
   );
 }
-
-

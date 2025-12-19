@@ -4,13 +4,12 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Menu, X, Bell, Settings, LogOut } from 'lucide-react';
+import { Bell, Settings } from 'lucide-react';
 
 // Components
 import VideoFeed from './components/VideoFeed';
 import MetricsPanel from './components/MetricsPanel';
 import EmergencyAlert from './components/EmergencyAlert';
-import TrafficFlowChart from './components/TrafficFlowChart';
 import DetectionControls from './components/DetectionControls';
 import TrafficSignalVisualizer from './components/TrafficSignalVisualizer';
 import TrafficControlPanel from './components/TrafficControlPanel';
@@ -20,10 +19,10 @@ import wsService from './services/websocket';
 import useDashboardStore from './stores/dashboardStore';
 
 function App() {
-  const { 
-    connected, 
-    setConnected, 
-    updateMetrics, 
+  const {
+    connected,
+    setConnected,
+    updateMetrics,
     updateFrame,
     addAlert,
     clearAllAlerts
@@ -37,7 +36,7 @@ function App() {
 
   useEffect(() => {
     console.log('App.jsx: Attempting WebSocket connection to', serverUrl);
-    
+
     wsService.connect(
       serverUrl,
       () => {
@@ -102,106 +101,59 @@ function App() {
       unsubAlert();
       wsService.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverUrl]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1f2e] via-[#242b3d] to-[#2d3548]">
+    <div className="min-h-screen bg-[#0a0a0a]">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <header className="sticky top-0 z-40 bg-[#0a0a0a] border-b border-[#1a1a1a]">
+        <div className="max-w-[1600px] mx-auto px-6">
+          <div className="flex justify-between items-center h-14">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-pastel-blue to-pastel-purple rounded-lg flex items-center justify-center shadow-glow-blue">
-                <span className="text-lg font-bold text-slate-950">TC</span>
+              <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
+                <span className="text-sm font-bold text-black">TC</span>
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-slate-50">Traffic Control System</h1>
-                <p className="text-xs text-slate-400">Real-time Management</p>
+              <div>
+                <h1 className="text-base font-semibold text-white">Traffic Control</h1>
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
+            {/* Status & Actions */}
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'}`} />
-                <span className={`text-sm font-medium ${connected ? 'text-pastel-green' : 'text-pastel-rose'}`}>
+                <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className={`text-xs font-medium ${connected ? 'text-green-400' : 'text-red-400'}`}>
                   {connected ? 'Connected' : 'Offline'}
                 </span>
               </div>
 
-              <button 
+              <button
                 onClick={() => setUnreadAlerts(0)}
-                className="relative p-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg transition-colors"
-              >
-                <Bell className="w-5 h-5" />
-                {unreadAlerts > 0 && (
-                  <span className="absolute top-1 right-1 w-5 h-5 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                    {unreadAlerts}
-                  </span>
-                )}
-              </button>
-
-              <button 
-                onClick={() => setShowSettings(!showSettings)}
-                className="p-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg transition-colors"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
-
-              <button className="p-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg transition-colors">
-                <LogOut className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button 
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="md:hidden p-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg"
-            >
-              {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-700 bg-slate-900">
-            <div className="px-4 py-3 space-y-2">
-              <button 
-                onClick={() => setUnreadAlerts(0)}
-                className="w-full text-left px-3 py-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg flex items-center gap-2"
+                className="p-2 text-gray-500 hover:text-white rounded transition-colors"
               >
                 <Bell className="w-4 h-4" />
-                Notifications
               </button>
-              <button 
-                onClick={() => {
-                  setShowSettings(!showSettings);
-                  setShowMobileMenu(false);
-                }}
-                className="w-full text-left px-3 py-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg flex items-center gap-2"
+
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="p-2 text-gray-500 hover:text-white rounded transition-colors"
               >
                 <Settings className="w-4 h-4" />
-                Settings
-              </button>
-              <button className="w-full text-left px-3 py-2 text-slate-400 hover:text-pastel-blue hover:bg-slate-800 rounded-lg flex items-center gap-2">
-                <LogOut className="w-4 h-4" />
-                Logout
               </button>
             </div>
           </div>
-        )}
+        </div>
       </header>
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="bg-slate-800 border-b border-slate-700 px-4 sm:px-6 lg:px-8 py-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">
+        <div className="bg-[#141414] border-b border-[#1a1a1a] px-6 py-4">
+          <div className="max-w-[1600px] mx-auto">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1 max-w-md">
+                <label className="block text-xs font-medium text-gray-400 mb-2">
                   Server URL
                 </label>
                 <input
@@ -211,41 +163,38 @@ function App() {
                   className="input"
                 />
               </div>
-              <div className="flex items-end gap-2">
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="flex-1 btn btn-primary"
-                >
-                  Reconnect
-                </button>
-                <button 
-                  onClick={() => setShowSettings(false)}
-                  className="px-4 py-2 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium"
-                >
-                  Close
-                </button>
-              </div>
+              <button
+                onClick={() => window.location.reload()}
+                className="btn btn-primary"
+              >
+                Reconnect
+              </button>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="btn btn-secondary"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Mode Toggle Bar */}
-      <div className="bg-slate-800 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      {/* Mode Toggle */}
+      <div className="bg-[#0a0a0a] border-b border-[#1a1a1a]">
+        <div className="max-w-[1600px] mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-300">Simulation Mode:</span>
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</span>
             <div className="flex gap-2">
               <button
                 onClick={() => {
                   setSimulationMode('manual');
                   window.dispatchEvent(new CustomEvent('modeChanged', { detail: { mode: 'manual' } }));
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  simulationMode === 'manual'
-                    ? 'bg-gradient-to-r from-pastel-blue to-pastel-purple text-slate-950 shadow-glow-blue'
-                    : 'bg-slate-700 text-slate-300 hover:border-pastel-blue border border-slate-600'
-                }`}
+                className={`px-4 py-1.5 rounded text-xs font-medium transition-all ${simulationMode === 'manual'
+                  ? 'bg-white text-black'
+                  : 'bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]'
+                  }`}
               >
                 Manual
               </button>
@@ -254,11 +203,10 @@ function App() {
                   setSimulationMode('automatic');
                   window.dispatchEvent(new CustomEvent('modeChanged', { detail: { mode: 'automatic' } }));
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  simulationMode === 'automatic'
-                    ? 'bg-gradient-to-r from-pastel-green to-pastel-teal text-white shadow-lg'
-                    : 'bg-slate-700 text-slate-300 hover:border-green-500 border border-slate-600'
-                }`}
+                className={`px-4 py-1.5 rounded text-xs font-medium transition-all ${simulationMode === 'automatic'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]'
+                  }`}
               >
                 Automatic
               </button>
@@ -268,30 +216,28 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-[1600px] mx-auto px-6 py-6">
         {/* Emergency Alert */}
-        <div className="mb-8">
-          <EmergencyAlert />
-        </div>
+        <EmergencyAlert />
 
-        {/* Top Row: Detection Controls & Video Feed */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-1">
+        {/* Row 1: Detection Controls | Live Feed */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mt-5">
+          <div className="lg:col-span-4">
             <div className="card">
-              <DetectionControls 
-                onVideoStop={() => clearAllAlerts()}
-              />
+              <h2 className="card-title">Detection Controls</h2>
+              <DetectionControls onVideoStop={() => clearAllAlerts()} />
             </div>
           </div>
-          <div className="lg:col-span-2">
-            <div className="card">
+          <div className="lg:col-span-8">
+            <div className="card min-h-[400px]">
+              <h2 className="card-title">Live Feed</h2>
               <VideoFeed />
             </div>
           </div>
         </div>
 
-        {/* Middle Row: Signal Visualizer & Control Panel */}
-        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        {/* Row 2: Traffic Junction | System Metrics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
           <div className="card">
             <TrafficSignalVisualizer simulationMode={simulationMode} />
           </div>
@@ -300,26 +246,14 @@ function App() {
           </div>
         </div>
 
-        {/* Bottom Row: Metrics & Charts */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Row 3: Metrics */}
+        <div className="mt-5">
           <div className="card">
             <h2 className="card-title">System Metrics</h2>
             <MetricsPanel />
           </div>
-          <div className="card">
-            <h2 className="card-title">Traffic Flow</h2>
-            <TrafficFlowChart timeRange={10} />
-          </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-700 bg-slate-900 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-slate-400">
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

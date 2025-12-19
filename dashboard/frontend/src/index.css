@@ -2,238 +2,220 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Premium Pastel Theme with Soft Gradients */
+/* ================================================
+   MONOCHROME MINIMALIST THEME
+   Clean black, white, and gray palette
+   ================================================ */
+
 @layer base {
   :root {
-    --primary: #a5b4fc;
-    --secondary: #d8b4fe;
-    --accent-blue: #a5b4fc;
-    --accent-purple: #d8b4fe;
-    --accent-pink: #f9a8d4;
-    --success: #86efac;
-    --danger: #fda4af;
-    --warning: #fcd34d;
+    /* Monochrome palette */
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #141414;
+    --bg-card: #1a1a1a;
+    --bg-elevated: #242424;
+    --border-subtle: #2a2a2a;
+    --border-default: #333333;
+    --border-strong: #444444;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    --accent: #ffffff;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
   }
 
   html {
-    @apply scroll-smooth;
+    @apply scroll-smooth antialiased;
   }
 
   body {
-    @apply m-0 min-h-screen bg-gradient-to-br from-[#1a1f2e] via-[#242b3d] to-[#2d3548] text-slate-100 font-sans;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    @apply m-0 min-h-screen text-white font-sans;
+    background: var(--bg-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold text-slate-50 tracking-tight;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold text-white tracking-tight;
   }
 
   button {
-    @apply cursor-pointer transition-all duration-200;
-  }
-
-  input, select, textarea {
-    @apply bg-slate-800/50 text-slate-100 border-slate-600/50;
-  }
-
-  a {
-    @apply text-pastel-blue hover:text-pastel-purple transition-colors;
+    @apply cursor-pointer transition-all duration-150;
   }
 }
 
-/* Card Component */
+/* ================================================
+   COMPONENT STYLES
+   ================================================ */
+
 @layer components {
+
+  /* Card - Clean flat design */
   .card {
-    @apply relative bg-gradient-to-br from-[#242b3d]/90 to-[#2d3548]/80 rounded-2xl shadow-xl border border-slate-700/50 p-6 hover:border-pastel-purple/50 transition-all duration-300 backdrop-blur-md;
-    background-image: linear-gradient(135deg, rgba(36, 43, 61, 0.9) 0%, rgba(45, 53, 72, 0.8) 100%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    @apply rounded-xl p-5;
   }
 
-  .card-compact {
-    @apply bg-slate-800/50 rounded-xl shadow-md border border-slate-700/50 p-4 hover:border-pastel-blue/40 transition-colors backdrop-blur-sm;
+  .card:hover {
+    border-color: var(--border-default);
   }
 
   .card-title {
-    @apply text-xl font-bold bg-gradient-to-r from-pastel-blue via-pastel-purple to-pastel-pink bg-clip-text text-transparent mb-4;
+    @apply text-base font-semibold text-white mb-4 uppercase tracking-wider;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
   }
 
-  .card-subtitle {
-    @apply text-sm text-slate-400 mb-3;
-  }
-
-  /* Button Variants */
+  /* Buttons */
   .btn {
-    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900;
+    @apply px-4 py-2 rounded-lg font-medium text-sm transition-all;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-pastel-blue to-pastel-purple text-slate-900 hover:shadow-glow-purple active:opacity-90 font-bold;
+    @apply bg-white text-black hover:bg-gray-200;
   }
 
   .btn-secondary {
-    @apply bg-slate-700/60 text-pastel-blue border border-pastel-blue/40 hover:bg-slate-600/70 hover:shadow-glow-blue;
-  }
-
-  .btn-danger {
-    @apply bg-gradient-to-r from-pastel-rose to-pastel-pink text-slate-900 hover:shadow-glow-pink active:opacity-90 font-bold;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    @apply text-white hover:border-white;
   }
 
   .btn-success {
-    @apply bg-gradient-to-r from-pastel-green to-pastel-teal text-slate-900 hover:shadow-glow-green active:opacity-90 font-bold;
+    @apply bg-green-600 text-white hover:bg-green-500;
   }
 
-  .btn-outline {
-    @apply border-2 border-pastel-purple text-pastel-purple hover:bg-slate-800/50 focus:ring-pastel-purple;
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-500;
   }
 
-  .btn-sm {
-    @apply px-3 py-1 text-sm;
-  }
-
-  .btn-lg {
-    @apply px-6 py-3 text-lg;
-  }
-
-  /* Badge Variants */
+  /* Badge */
   .badge {
-    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-slate-800/70 border backdrop-blur-sm;
-  }
-
-  .badge-primary {
-    @apply border-pastel-blue/50 text-pastel-blue;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
   }
 
   .badge-success {
-    @apply border-pastel-green/50 text-pastel-green;
+    @apply text-green-400 border-green-800;
   }
 
   .badge-danger {
-    @apply border-pastel-rose/50 text-pastel-rose;
+    @apply text-red-400 border-red-800;
   }
 
   .badge-warning {
-    @apply border-pastel-yellow/50 text-pastel-yellow;
+    @apply text-yellow-400 border-yellow-800;
   }
 
-  /* Input Styles */
+  /* Input */
   .input {
-    @apply w-full px-3 py-2 border border-slate-600/50 rounded-lg bg-slate-800/50 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-pastel-purple focus:border-transparent transition-colors;
+    @apply w-full px-3 py-2 rounded-lg text-white text-sm;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
   }
 
-  .input-sm {
-    @apply px-2 py-1 text-sm;
-  }
-
-  .input-lg {
-    @apply px-4 py-3 text-lg;
-  }
-
-  /* Select Styles */
-  select {
-    @apply border border-slate-600/50 rounded-lg px-3 py-2 bg-slate-800/50 text-slate-100 focus:outline-none focus:ring-2 focus:ring-pastel-purple;
+  .input:focus {
+    @apply outline-none ring-1 ring-white;
   }
 
   /* Metric Card */
   .metric-card {
-    @apply bg-slate-800/60 rounded-xl shadow-md border border-slate-700/50 p-6 text-center hover:border-pastel-blue/50 transition-colors backdrop-blur-sm;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    @apply rounded-lg p-4 text-center;
   }
 
   .metric-value {
-    @apply text-3xl font-bold bg-gradient-to-r from-pastel-blue to-pastel-purple bg-clip-text text-transparent my-2;
+    @apply text-2xl font-bold text-white;
   }
 
   .metric-label {
-    @apply text-sm text-slate-400 font-medium;
+    @apply text-xs uppercase tracking-wider mt-1;
+    color: var(--text-muted);
   }
 
-  /* Status Indicator */
-  .status-indicator {
-    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border backdrop-blur-sm;
-  }
-
+  /* Status indicators */
   .status-online {
-    @apply bg-slate-800/70 border-pastel-green/50 text-pastel-green;
+    @apply text-green-400;
   }
 
   .status-offline {
-    @apply bg-slate-800/70 border-pastel-rose/50 text-pastel-rose;
+    @apply text-red-400;
   }
 
-  .status-idle {
-    @apply bg-slate-800/70 border-slate-600/50 text-slate-400;
-  }
-
-  .status-warning {
-    @apply bg-slate-800/70 border-pastel-yellow/50 text-pastel-yellow;
-  }
-
-  /* Alert */
+  /* Alerts */
   .alert-emergency {
-    @apply bg-slate-800/60 border border-pastel-rose/50 text-pastel-rose px-4 py-3 rounded-lg backdrop-blur-sm;
-  }
-
-  .alert-warning {
-    @apply bg-slate-800/60 border border-pastel-yellow/50 text-pastel-yellow px-4 py-3 rounded-lg backdrop-blur-sm;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    @apply text-red-400 px-4 py-3 rounded-lg;
   }
 
   .alert-success {
-    @apply bg-slate-800/60 border border-pastel-green/50 text-pastel-green px-4 py-3 rounded-lg backdrop-blur-sm;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    @apply text-green-400 px-4 py-3 rounded-lg;
   }
 
-  .alert-info {
-    @apply bg-slate-800/60 border border-pastel-blue/50 text-pastel-blue px-4 py-3 rounded-lg backdrop-blur-sm;
+  .alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    @apply text-yellow-400 px-4 py-3 rounded-lg;
   }
 
-  /* Table */
-  table {
-    @apply w-full border-collapse;
-  }
-
-  th {
-    @apply bg-slate-800/60 text-pastel-blue font-bold p-3 text-left border-b border-slate-700/50;
-  }
-
-  td {
-    @apply p-3 border-b border-slate-700/50 text-slate-300;
-  }
-
-  tr:hover {
-    @apply bg-slate-700/40;
-  }
-
+  /* Divider */
   .divider {
-    @apply my-4 border-t border-slate-700/50;
+    border-color: var(--border-subtle);
+    @apply my-4 border-t;
   }
 }
 
-/* Scrollbar Styling */
+/* ================================================
+   SCROLLBAR - Minimal
+   ================================================ */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1f2e;
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
-  border-radius: 4px;
+  background: var(--border-default);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #c7d2fe 0%, #e9d5ff 100%);
-  box-shadow: 0 0 10px rgba(165, 180, 252, 0.3);
+  background: var(--border-strong);
 }
 
-/* Responsive utilities */
-@media (max-width: 768px) {
-  .hidden-mobile {
-    @apply hidden;
-  }
+/* ================================================
+   UTILITY CLASSES
+   ================================================ */
+
+.text-muted {
+  color: var(--text-muted);
 }
 
-@media (min-width: 769px) {
-  .hidden-desktop {
-    @apply hidden;
-  }
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.bg-elevated {
+  background: var(--bg-elevated);
+}
+
+.border-subtle {
+  border-color: var(--border-subtle);
 }

@@ -1,17 +1,20 @@
 """
 Indian Traffic Signal - Sequential Phase System
 
-Phase-based sequential control:
-- Phase 1: SOUTH GREEN (35s) - vehicles move from NORTH→SOUTH
-- Phase 2: SOUTH YELLOW (5s) - warning
-- Phase 3: WEST GREEN (35s) - vehicles move from EAST→WEST
-- Phase 4: WEST YELLOW (5s) - warning
-- Phase 5: NORTH GREEN (35s) - vehicles move from SOUTH→NORTH
-- Phase 6: NORTH YELLOW (5s) - warning
-- Phase 7: EAST GREEN (35s) - vehicles move from WEST→EAST
-- Phase 8: EAST YELLOW (5s) - warning
-- Phase 9: All RED (2s) - safety clearance
-- Total cycle: ~168 seconds
+Phase-based sequential control with VARIABLE TIMING per road:
+- Phase 1: NORTH GREEN (45s) - major road, higher traffic
+- Phase 2: NORTH YELLOW (5s) - warning
+- Phase 3: EAST GREEN (30s) - minor road, lower traffic
+- Phase 4: EAST YELLOW (5s) - warning
+- Phase 5: SOUTH GREEN (45s) - major road, higher traffic
+- Phase 6: SOUTH YELLOW (5s) - warning
+- Phase 7: WEST GREEN (30s) - minor road, lower traffic
+- Phase 8: WEST YELLOW (5s) - warning
+- Phase 9: All RED (2s) - safety clearance buffer
+- Total cycle: ~172 seconds (realistic Indian timing)
+
+Note: In Indian junctions, timing varies per road based on traffic volume.
+Major roads (N-S axis) get longer green time than minor roads (E-W axis).
 """
 
 from enum import Enum
@@ -116,29 +119,31 @@ class IntersectionController:
         self.current_phase = IntersectionPhase.PHASE_1
         self.phase_elapsed_time = 0.0
 
-        # Phase timings (seconds)
+        # Phase timings - VARIABLE per road based on traffic patterns
+        # North-South is major road (more traffic): 45s green
+        # East-West is minor road (less traffic): 30s green
         self.phase_timings = {
-            IntersectionPhase.PHASE_1: 35,
-            IntersectionPhase.PHASE_2: 5,
-            IntersectionPhase.PHASE_3: 35,
-            IntersectionPhase.PHASE_4: 5,
-            IntersectionPhase.PHASE_5: 35,
-            IntersectionPhase.PHASE_6: 5,
-            IntersectionPhase.PHASE_7: 35,
-            IntersectionPhase.PHASE_8: 5,
-            IntersectionPhase.PHASE_9: 2,
+            IntersectionPhase.PHASE_1: 45,  # NORTH GREEN (major road)
+            IntersectionPhase.PHASE_2: 5,   # NORTH YELLOW
+            IntersectionPhase.PHASE_3: 30,  # EAST GREEN (minor road)
+            IntersectionPhase.PHASE_4: 5,   # EAST YELLOW
+            IntersectionPhase.PHASE_5: 45,  # SOUTH GREEN (major road)
+            IntersectionPhase.PHASE_6: 5,   # SOUTH YELLOW
+            IntersectionPhase.PHASE_7: 30,  # WEST GREEN (minor road)
+            IntersectionPhase.PHASE_8: 5,   # WEST YELLOW
+            IntersectionPhase.PHASE_9: 2,   # ALL RED (safety buffer)
         }
 
-        # Phase to direction mapping
+        # Phase to direction mapping (clockwise: N → E → S → W)
         self.phase_directions = {
-            IntersectionPhase.PHASE_1: {'state': SignalState.GREEN, 'direction': 'south'},
-            IntersectionPhase.PHASE_2: {'state': SignalState.YELLOW, 'direction': 'south'},
-            IntersectionPhase.PHASE_3: {'state': SignalState.GREEN, 'direction': 'west'},
-            IntersectionPhase.PHASE_4: {'state': SignalState.YELLOW, 'direction': 'west'},
-            IntersectionPhase.PHASE_5: {'state': SignalState.GREEN, 'direction': 'north'},
-            IntersectionPhase.PHASE_6: {'state': SignalState.YELLOW, 'direction': 'north'},
-            IntersectionPhase.PHASE_7: {'state': SignalState.GREEN, 'direction': 'east'},
-            IntersectionPhase.PHASE_8: {'state': SignalState.YELLOW, 'direction': 'east'},
+            IntersectionPhase.PHASE_1: {'state': SignalState.GREEN, 'direction': 'north'},
+            IntersectionPhase.PHASE_2: {'state': SignalState.YELLOW, 'direction': 'north'},
+            IntersectionPhase.PHASE_3: {'state': SignalState.GREEN, 'direction': 'east'},
+            IntersectionPhase.PHASE_4: {'state': SignalState.YELLOW, 'direction': 'east'},
+            IntersectionPhase.PHASE_5: {'state': SignalState.GREEN, 'direction': 'south'},
+            IntersectionPhase.PHASE_6: {'state': SignalState.YELLOW, 'direction': 'south'},
+            IntersectionPhase.PHASE_7: {'state': SignalState.GREEN, 'direction': 'west'},
+            IntersectionPhase.PHASE_8: {'state': SignalState.YELLOW, 'direction': 'west'},
             IntersectionPhase.PHASE_9: {'state': SignalState.ALL_RED, 'direction': 'all'},
         }
 

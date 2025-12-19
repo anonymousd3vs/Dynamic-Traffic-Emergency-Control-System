@@ -28,23 +28,23 @@ class DynamicTimingIntegration:
     6. Frontend shows adjusted timing in real-time
     """
 
-    # Mapping: Selected Lane → Signal Phase
+    # Mapping: Selected Lane → Signal Phase (clockwise: N → E → S → W)
     LANE_MAPPING = {
         'north': {
             'detection_zone': 'NORTH',
-            'signal_phase': 'PHASE_5',  # NORTH GREEN
-        },
-        'south': {
-            'detection_zone': 'SOUTH',
-            'signal_phase': 'PHASE_1',  # SOUTH GREEN
+            'signal_phase': 'PHASE_1',  # NORTH GREEN (45s major)
         },
         'east': {
             'detection_zone': 'EAST',
-            'signal_phase': 'PHASE_7',  # EAST GREEN
+            'signal_phase': 'PHASE_3',  # EAST GREEN (30s minor)
+        },
+        'south': {
+            'detection_zone': 'SOUTH',
+            'signal_phase': 'PHASE_5',  # SOUTH GREEN (45s major)
         },
         'west': {
             'detection_zone': 'WEST',
-            'signal_phase': 'PHASE_3',  # WEST GREEN
+            'signal_phase': 'PHASE_7',  # WEST GREEN (30s minor)
         },
     }
 
@@ -74,10 +74,10 @@ class DynamicTimingIntegration:
         self.dynamic_timing_enabled = True
         self.vehicle_count_selected_lane = 0
         self.timing_calculator = DynamicTimingCalculator(
-            base_cycle_time=90,
-            min_green=15,
-            max_green=60,
-            yellow_duration=4,
+            base_cycle_time=172,  # Realistic Indian cycle (~172s)
+            min_green=30,         # Min green per Indian standards
+            max_green=90,         # Max green for peak hours
+            yellow_duration=5,    # 5s yellow for peak hours
             smoothing_enabled=True,
             smoothing_window=5
         )

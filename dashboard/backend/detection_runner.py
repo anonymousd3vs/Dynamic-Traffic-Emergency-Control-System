@@ -174,9 +174,16 @@ class DetectionStreamingRunner:
             # Set environment variable for headless mode
             os.environ['DASHBOARD_MODE'] = '1'
 
-            # Open video source
+            # Open video source - resolve relative paths to project root
             logger.info(f"Opening video source: {source}")
-            cap = cv2.VideoCapture(int(source) if source.isdigit() else source)
+            video_source = source
+            if not source.isdigit():
+                # Check if it's a relative path, convert to absolute
+                source_path = Path(source)
+                if not source_path.is_absolute():
+                    video_source = str(project_root / source)
+                    logger.info(f"Resolved video path: {video_source}")
+            cap = cv2.VideoCapture(int(source) if source.isdigit() else video_source)
 
             if not cap.isOpened():
                 logger.error(f"Failed to open video source: {source}")

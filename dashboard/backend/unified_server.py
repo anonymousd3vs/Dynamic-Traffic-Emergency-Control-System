@@ -130,30 +130,60 @@ class UnifiedDashboardServer:
         """Get current signal status for all directions."""
         try:
             signals = {}
+            controller = self.signal_controller
 
-            # Calculate time remaining based on emergency status
-            if self.signal_controller.emergency_active and self.signal_controller.emergency_start_time:
-                # During emergency: show remaining emergency time (45 seconds total)
-                emergency_elapsed = (
-                    datetime.now() - self.signal_controller.emergency_start_time).total_seconds()
-                time_remaining = max(0, 45 - emergency_elapsed)
-            else:
-                # Normal operation: show remaining phase time
-                phase_duration = self.signal_controller.phase_timings.get(
-                    self.signal_controller.current_phase, 0)
-                time_remaining = max(0, phase_duration -
-                                     self.signal_controller.phase_elapsed_time)
+            # Get current phase info
+            current_phase = controller.current_phase
+            phase_elapsed = controller.phase_elapsed_time
+            
+            # Phase sequence: N(1) -> E(3) -> S(5) -> W(7) with yellows in between
+            # Map direction to their GREEN phase number
+            direction_to_green_phase = {
+                'north': 1,  # PHASE_1
+                'east': 3,   # PHASE_3
+                'south': 5,  # PHASE_5
+                'west': 7,   # PHASE_7
+            }
+            
+            # Calculate remaining time in current phase
+            current_phase_num = current_phase.value
+            current_phase_duration = controller.phase_timings.get(current_phase, 0)
+            time_left_in_current_phase = max(0, current_phase_duration - phase_elapsed)
 
             for direction in ['north', 'south', 'east', 'west']:
-                lane = self.signal_controller.lanes[direction]
+                lane = controller.lanes[direction]
+                green_phase_num = direction_to_green_phase[direction]
+                
+                if controller.emergency_active and controller.emergency_start_time:
+                    # During emergency
+                    emergency_elapsed = (datetime.now() - controller.emergency_start_time).total_seconds()
+                    if lane.ambulance_active:
+                        time_remaining = max(0, 45 - emergency_elapsed)
+                    else:
+                        time_remaining = max(0, 45 - emergency_elapsed)
+                elif lane.current_state.value == 'GREEN':
+                    # This direction is currently green - show remaining green time
+                    time_remaining = time_left_in_current_phase
+                elif lane.current_state.value == 'YELLOW':
+                    # This direction is yellow - show remaining yellow time
+                    time_remaining = time_left_in_current_phase
+                else:
+                    # RED - calculate cumulative wait until this direction gets GREEN
+                    time_remaining = self._calculate_wait_until_green(
+                        current_phase_num, 
+                        green_phase_num,
+                        time_left_in_current_phase,
+                        controller.phase_timings
+                    )
+                
                 signals[direction] = {
                     'state': lane.current_state.value,
                     'elapsed': round(lane.elapsed_time, 2),
-                    'timeRemaining': round(time_remaining, 2),
+                    'timeRemaining': round(time_remaining, 1),
                     'isAmbulance': lane.ambulance_active,
                 }
 
-            stats = self.signal_controller.get_statistics()
+            stats = controller.get_statistics()
 
             response = {
                 'signals': signals,
@@ -174,6 +204,45 @@ class UnifiedDashboardServer:
                 {'error': str(e)},
                 status=500
             )
+
+    def _calculate_wait_until_green(self, current_phase_num: int, target_green_phase: int, 
+                                     time_left_current: float, phase_timings: dict) -> float:
+        """
+        Calculate cumulative wait time until a direction gets GREEN.
+        
+        Phase structure (9 phases total, wraps around):
+        1=N_GREEN, 2=N_YELLOW, 3=E_GREEN, 4=E_YELLOW, 
+        5=S_GREEN, 6=S_YELLOW, 7=W_GREEN, 8=W_YELLOW, 9=ALL_RED
+        
+        Example: If current=1 (N GREEN) and target=5 (S GREEN):
+        Wait = time_left_phase_1 + phase_2 + phase_3 + phase_4 = remaining_N + Y + E_green + E_yellow
+        """
+        from traffic_signals.core.indian_traffic_signal import IntersectionPhase
+        
+        total_wait = time_left_current
+        
+        # Get list of phases
+        phases = list(IntersectionPhase)
+        total_phases = len(phases)  # 9 phases
+        
+        # Start from the next phase after current
+        current_idx = current_phase_num - 1  # Convert to 0-indexed
+        target_idx = target_green_phase - 1
+        
+        # Move through phases until we reach target
+        idx = (current_idx + 1) % total_phases
+        
+        while idx != target_idx:
+            phase = phases[idx]
+            phase_duration = phase_timings.get(phase, 0)
+            total_wait += phase_duration
+            idx = (idx + 1) % total_phases
+            
+            # Safety: prevent infinite loop
+            if total_wait > 500:
+                break
+        
+        return total_wait
 
     async def _handle_trigger_ambulance(self, request: web.Request) -> web.Response:
         """Trigger ambulance mode for a specific direction."""
